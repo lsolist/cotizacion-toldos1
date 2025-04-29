@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Generador de Cotización</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f8f9fa;
+      padding: 30px;
+    }
+
+    .formulario, .cotizacion-container {
+      background: #fff;
+      border-radius: 10px;
+      padding: 25px;
+      max-width: 700px;
+      margin: 20px auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .formulario h2, .cotizacion-container h2 {
+      text-align: center;
+      color: #007b5e;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    .form-group input, .form-group textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ced4da;
+      border-radius: 5px;
+    }
+
+    .btn {
+      display: block;
+      width: fit-content;
+      margin: 20px auto 0;
+      padding: 10px 20px;
+      background: #007b5e;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background: #005f4a;
+    }
+
+    .cotizacion-container {
+      display: none;
+    }
+
+    .dato {
+      margin: 10px 0;
+    }
+
+    .firma {
+      margin-top: 30px;
+    }
+
+    .logo {
+      text-align: right;
+      margin-top: 30px;
+    }
+
+    .logo img {
+      height: 50px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="formulario">
+    <h2>Generar Cotización</h2>
+    <div class="form-group">
+      <label>Servicio</label>
+      <input type="text" id="servicio" value="Renta de tarima de 3x4m (altura de 60 cm o 1m)" />
+    </div>
+    <div class="form-group">
+      <label>Fecha del evento</label>
+      <input type="date" id="fechaEvento" />
+    </div>
+    <div class="form-group">
+      <label>Lugar</label>
+      <input type="text" id="lugar" />
+    </div>
+    <div class="form-group">
+      <label>Monto total (MXN)</label>
+      <input type="number" id="monto" />
+    </div>
+    <div class="form-group">
+      <label>Incluye</label>
+      <input type="text" id="incluye" value="Instalación y envío" />
+    </div>
+    <div class="form-group">
+      <label>Anticipo requerido (MXN)</label>
+      <input type="number" id="anticipo" value="500" />
+    </div>
+    <div class="form-group">
+      <label>Fecha de emisión</label>
+      <input type="date" id="fechaEmision" />
+    </div>
+    <div class="form-group">
+      <label>Vigencia (días)</label>
+      <input type="number" id="vigencia" value="15" />
+    </div>
+    <button class="btn" onclick="generarCotizacion()">Generar Cotización</button>
+  </div>
+
+  <div class="cotizacion-container" id="cotizacion">
+    <h2>COTIZACIÓN DE SERVICIO</h2>
+    <div class="dato"><strong>Servicio:</strong> <span id="outServicio"></span></div>
+    <div class="dato"><strong>Fecha del evento:</strong> <span id="outFechaEvento"></span></div>
+    <div class="dato"><strong>Lugar:</strong> <span id="outLugar"></span></div>
+    <div class="dato"><strong>Monto total:</strong> $<span id="outMonto"></span> MXN</div>
+    <div class="dato"><strong>Incluye:</strong> <span id="outIncluye"></span></div>
+    <div class="dato"><strong>Anticipo requerido:</strong> $<span id="outAnticipo"></span> MXN para separación</div>
+    <div class="dato"><strong>Fecha de emisión:</strong> <span id="outFechaEmision"></span></div>
+    <div class="dato"><strong>Vigencia:</strong> <span id="outVigencia"></span> días naturales</div>
+
+    <div class="firma">
+      <p>Atentamente,</p>
+      <p><strong>Liliana Solís</strong></p>
+      <p>Teléfono: 811050463</p>
+    </div>
+
+    <div class="logo">
+      <img src="https://via.placeholder.com/120x60.png?text=JOGAR+CUEPTOS" alt="Logo">
+    </div>
+  </div>
+
+  <button class="btn" onclick="descargarPDF()">Descargar PDF</button>
+
+  <script>
+    function generarCotizacion() {
+      document.getElementById("outServicio").innerText = document.getElementById("servicio").value;
+      document.getElementById("outFechaEvento").innerText = document.getElementById("fechaEvento").value;
+      document.getElementById("outLugar").innerText = document.getElementById("lugar").value;
+      document.getElementById("outMonto").innerText = parseFloat(document.getElementById("monto").value).toFixed(2);
+      document.getElementById("outIncluye").innerText = document.getElementById("incluye").value;
+      document.getElementById("outAnticipo").innerText = parseFloat(document.getElementById("anticipo").value).toFixed(2);
+      document.getElementById("outFechaEmision").innerText = document.getElementById("fechaEmision").value;
+      document.getElementById("outVigencia").innerText = document.getElementById("vigencia").value;
+
+      document.getElementById("cotizacion").style.display = "block";
+      window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+    }
+
+    function descargarPDF() {
+      const cotizacion = document.getElementById('cotizacion');
+      html2pdf()
+        .set({
+          margin: 10,
+          filename: 'cotizacion_jogar.pdf',
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2 },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        })
+        .from(cotizacion)
+        .save();
+    }
+  </script>
+
+</body>
+</html>
+
